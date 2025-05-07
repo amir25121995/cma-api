@@ -8,7 +8,7 @@
     "dev": "nodemon index.js"
   },
   "engines": {
-    "node": "22.14.0" // Specify your Node.js version
+    "node": "22.14.0"
   },
   "keywords": [],
   "author": "",
