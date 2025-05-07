@@ -77,7 +77,7 @@ app.post('/auth/refresh', async (req, res) => {
 });
 
 // health check
-app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/health', (_req, res) => res.json({ status: 'ok amir' }));
 
 // ─── MOUNT CRUD ROUTERS ────────────────────────────────────────────────────
 app.use('/clients',   authenticate, require('./routers/clients'));
