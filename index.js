@@ -36,15 +36,22 @@ app.post('/auth/register', async (req, res) => {
   try {
     const pwHash = await hashPassword(password);
     const { rows } = await db.query(
-      `INSERT INTO users(role_id,name,email,password)
-       VALUES($1,$2,$3,$4) RETURNING id,email`,
+      `INSERT INTO users(role_id, name, email, password)
+       VALUES($1, $2, $3, $4) RETURNING id, email`,
       [role_id, name, email, pwHash]
     );
-    res.status(201).json({ user: rows[0] });
+    return res.status(201).json({ user: rows[0] });
   } catch (err) {
-    res.status(400).json({ error: err.detail || 'Registration error' });
+    console.error('🚨 registration error:', err);
+    return res
+      .status(400)
+      .json({ 
+        error: err.message || 'Unknown error', 
+        detail: err.detail || null 
+      });
   }
 });
+
 
 // LOGIN
 app.post('/auth/login', async (req, res) => {
