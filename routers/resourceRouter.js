@@ -2,9 +2,10 @@ const express = require('express');
 const db = require('../db');
 const { validatePayload, validatePositiveId } = require('../utils/validation');
 
-function createResourceRouter({ table, fields, required, emailFields = [] }) {
+function createResourceRouter({ table, fields, required, emailFields = [], defaultMaxLength = 255, maxLengths = {} }) {
   const router = express.Router();
-  const config = { allowed: fields, required, emailFields };
+  const config = { allowed: fields, required, emailFields, defaultMaxLength, maxLengths };
+  const updateConfig = { allowed: fields, emailFields, defaultMaxLength, maxLengths };
 
   function invalidId(req, res) {
     if (!validatePositiveId(req.params.id)) {
@@ -82,7 +83,7 @@ function createResourceRouter({ table, fields, required, emailFields = [] }) {
     if (Object.keys(req.body).length === 0) {
       return res.status(400).json({ error: 'At least one field is required for an update' });
     }
-    if (invalidPayload(req.body, { allowed: fields, emailFields }, res)) return;
+    if (invalidPayload(req.body, updateConfig, res)) return;
 
     const columns = Object.keys(req.body);
     try {
