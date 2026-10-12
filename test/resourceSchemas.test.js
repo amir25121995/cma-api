@@ -15,7 +15,7 @@ test('client schema rejects caller-supplied user_id and unknown columns', () => 
   const schema = schemas.clients;
   const result = validatePayload(
     { company_name: 'Example', user_id: '900', admin: 'true' },
-    { allowed: schema.fields, required: schema.required, emailFields: schema.emailFields }
+    { allowed: schema.fields, required: schema.required, emailFields: schema.emailFields, defaultMaxLength: schema.defaultMaxLength, maxLengths: schema.maxLengths }
   );
   assert.equal(result.valid, false);
   assert.equal(result.errors.some((error) => error.includes('user_id')), true);
@@ -29,6 +29,6 @@ test('case schema permits nullable optional dates but requires database non-null
     patient_name: 'Demo Patient', insurance: 'Example', ic_ref_no: 'IC-1',
     hospital_doctors: 'Demo Hospital', invoice_status: 'Pending',
     service_type: 'Assistance', final_invoice: null, mr_status: 'Open', remarks: null
-  }, { allowed: schema.fields, required: schema.required, emailFields: schema.emailFields });
+  }, { allowed: schema.fields, required: schema.required, emailFields: schema.emailFields, defaultMaxLength: schema.defaultMaxLength, maxLengths: schema.maxLengths });
   assert.equal(valid.valid, true);
 });
