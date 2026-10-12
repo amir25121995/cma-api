@@ -6,6 +6,7 @@ function isPlainObject(value) {
 
 function validatePayload(body, {
   required = [],
+  nonEmptyFields = [],
   allowed = [],
   emailFields = [],
   defaultMaxLength = 5000,
@@ -24,6 +25,12 @@ function validatePayload(body, {
   for (const field of required) {
     if (!(field in body) || typeof body[field] !== 'string' || body[field].trim() === '') {
       errors.push(`${field} is required and must be a non-empty string`);
+    }
+  }
+
+  for (const field of nonEmptyFields) {
+    if (field in body && typeof body[field] === 'string' && body[field].trim() === '') {
+      errors.push(`${field} must be a non-empty string`);
     }
   }
 
