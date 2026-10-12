@@ -39,3 +39,12 @@ test('validates positive integer IDs', () => {
   assert.equal(validatePositiveId('-1'), false);
   assert.equal(validatePositiveId('1abc'), false);
 });
+
+test('enforces field-specific maximum lengths', () => {
+  const result = validatePayload(
+    { email: 'a'.repeat(250) + '@example.com' },
+    { allowed: ['email'], maxLengths: { email: 255 } }
+  );
+  assert.equal(result.valid, false);
+  assert.match(result.errors[0], /255 characters or fewer/);
+});
