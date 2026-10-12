@@ -5,7 +5,7 @@ const { validatePayload, validatePositiveId } = require('../utils/validation');
 function createResourceRouter({ table, fields, required, emailFields = [], defaultMaxLength = 255, maxLengths = {} }) {
   const router = express.Router();
   const config = { allowed: fields, required, emailFields, defaultMaxLength, maxLengths };
-  const updateConfig = { allowed: fields, emailFields, defaultMaxLength, maxLengths };
+  const updateConfig = { allowed: fields, nonEmptyFields: required, emailFields, defaultMaxLength, maxLengths };
 
   function invalidId(req, res) {
     if (!validatePositiveId(req.params.id)) {
