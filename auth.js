@@ -16,6 +16,14 @@ function assertSecret(secret, name) {
   }
 }
 
+function assertDistinctSecrets() {
+  assertSecret(JWT_SECRET, 'JWT_SECRET');
+  assertSecret(REFRESH_SECRET, 'REFRESH_SECRET');
+  if (JWT_SECRET === REFRESH_SECRET) {
+    throw new Error('JWT_SECRET and REFRESH_SECRET must be different values');
+  }
+}
+
 async function hashPassword(password) {
   return bcrypt.hash(password, SALT_ROUNDS);
 }
@@ -25,8 +33,7 @@ async function verifyPassword(password, hash) {
 }
 
 function generateTokens(payload) {
-  assertSecret(JWT_SECRET, 'JWT_SECRET');
-  assertSecret(REFRESH_SECRET, 'REFRESH_SECRET');
+  assertDistinctSecrets();
   return {
     accessToken: jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }),
     refreshToken: jwt.sign(payload, REFRESH_SECRET, { expiresIn: REFRESH_EXPIRES_IN })
@@ -34,12 +41,12 @@ function generateTokens(payload) {
 }
 
 function verifyAccess(token) {
-  assertSecret(JWT_SECRET, 'JWT_SECRET');
+  assertDistinctSecrets();
   return jwt.verify(token, JWT_SECRET);
 }
 
 function verifyRefresh(token) {
-  assertSecret(REFRESH_SECRET, 'REFRESH_SECRET');
+  assertDistinctSecrets();
   return jwt.verify(token, REFRESH_SECRET);
 }
 
