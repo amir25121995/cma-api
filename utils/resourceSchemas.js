@@ -9,7 +9,9 @@ module.exports = {
       'company_name', 'billing_address', 'contact_person', 'contact_email',
       'finance_email', 'ops_email', 'contact_no', 'status_of_collab'
     ],
-    emailFields: ['contact_email', 'finance_email', 'ops_email']
+    emailFields: ['contact_email', 'finance_email', 'ops_email'],
+    defaultMaxLength: 255,
+    maxLengths: { billing_address: 5000, remarks: 5000 }
   },
   cases: {
     table: 'case_details',
@@ -22,7 +24,9 @@ module.exports = {
       'case_ref_no', 'country', 'city', 'patient_name', 'insurance', 'ic_ref_no',
       'hospital_doctors', 'invoice_status', 'service_type', 'mr_status'
     ],
-    emailFields: []
+    emailFields: [],
+    defaultMaxLength: 255,
+    maxLengths: { date_of_assistance: 10, final_invoice: 10 }
   },
   hospitals: {
     table: 'hospital_details',
@@ -35,7 +39,9 @@ module.exports = {
       'hospital_name', 'location_city', 'country', 'ops_email', 'phone_no',
       'contact_person', 'admin_email', 'branches', 'contact_no', 'mode_of_payment'
     ],
-    emailFields: ['ops_email', 'admin_email']
+    emailFields: ['ops_email', 'admin_email'],
+    defaultMaxLength: 255,
+    maxLengths: {}
   },
   providers: {
     table: 'provider_details',
@@ -48,6 +54,8 @@ module.exports = {
       'provider_name', 'regions_covered', 'service_type', 'case_fee',
       'contact_person', 'contact_no', 'contact_email', 'ops_email', 'finance_email'
     ],
-    emailFields: ['contact_email', 'ops_email', 'finance_email']
+    emailFields: ['contact_email', 'ops_email', 'finance_email'],
+    defaultMaxLength: 255,
+    maxLengths: {}
   }
 };
