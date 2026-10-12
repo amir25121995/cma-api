@@ -48,3 +48,12 @@ test('enforces field-specific maximum lengths', () => {
   assert.equal(result.valid, false);
   assert.match(result.errors[0], /255 characters or fewer/);
 });
+
+test('rejects empty strings in required fields during partial updates', () => {
+  const result = validatePayload(
+    { company_name: '' },
+    { allowed: ['company_name', 'remarks'], nonEmptyFields: ['company_name'] }
+  );
+  assert.equal(result.valid, false);
+  assert.match(result.errors[0], /non-empty string/);
+});
