@@ -47,7 +47,8 @@ app.post('/auth/register', async (req, res) => {
   const config = {
     required: ['name', 'email', 'password'],
     allowed: ['name', 'email', 'password'],
-    emailFields: ['email']
+    emailFields: ['email'],
+    maxLengths: { name: 120, email: 255, password: 1024 }
   };
   if (!validateAuthBody(req.body, config, res)) return;
 
@@ -57,6 +58,9 @@ app.post('/auth/register', async (req, res) => {
 
   if (name.length > 120) {
     return res.status(400).json({ error: 'name must be 120 characters or fewer' });
+  }
+  if (Buffer.byteLength(password, 'utf8') > 72) {
+    return res.status(400).json({ error: 'password must be 72 bytes or fewer' });
   }
   if (password.length < 12) {
     return res.status(400).json({ error: 'password must be at least 12 characters long' });
@@ -98,7 +102,8 @@ app.post('/auth/login', async (req, res) => {
   if (!validateAuthBody(req.body, {
     required: ['email', 'password'],
     allowed: ['email', 'password'],
-    emailFields: ['email']
+    emailFields: ['email'],
+    maxLengths: { email: 255, password: 1024 }
   }, res)) return;
 
   const email = req.body.email.trim().toLowerCase();
@@ -125,7 +130,8 @@ app.post('/auth/login', async (req, res) => {
 app.post('/auth/refresh', async (req, res) => {
   if (!validateAuthBody(req.body, {
     required: ['refreshToken'],
-    allowed: ['refreshToken']
+    allowed: ['refreshToken'],
+    maxLengths: { refreshToken: 5000 }
   }, res)) return;
 
   try {
