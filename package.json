@@ -1,7 +1,7 @@
 {
   "name": "cma-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Node.js and Express REST API for CMA client, case, hospital, and provider resources, backed by PostgreSQL with JWT authentication.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -10,8 +10,18 @@
   "engines": {
     "node": "22.14.0"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cma",
+    "rest-api",
+    "nodejs",
+    "express",
+    "postgresql",
+    "jwt",
+    "authentication",
+    "client-management",
+    "case-management"
+  ],
+  "author": "Amir Ali",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
