@@ -69,7 +69,7 @@ app.post('/auth/register', async (req, res) => {
 
   try {
     const roleResult = await db.query(
-      'SELECT role_id FROM roles WHERE role_id = $1 LIMIT 1',
+      'SELECT role_id FROM roles WHERE role_id = $1 AND LOWER(name) NOT IN ('admin', 'administrator', 'superadmin', 'system admin') LIMIT 1',
       [defaultRoleId]
     );
     if (!roleResult.rows.length) {
