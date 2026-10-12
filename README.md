@@ -4,56 +4,36 @@ A REST API built with Node.js, Express, and PostgreSQL for managing CMA resource
 
 ## Technology stack
 
-- Node.js (the repository specifies version 22.14.0)
+- Node.js 22
 - Express 5
 - PostgreSQL via `pg`
-- JSON Web Tokens via `jsonwebtoken`
-- `bcrypt` for password hashing
-- `dotenv` for environment configuration
-- `nodemon` for development
+- JWT access and refresh tokens
+- `bcrypt` password hashing
+- `dotenv` configuration
+- Node's built-in test runner
 
-## Current API surface
+## API surface
 
-The entry point mounts authentication routes and resource routers for clients, cases, hospitals, and providers.
+The API includes authentication routes, a health endpoint, and user-scoped CRUD routes for clients, cases, hospitals, and providers. Resource access is protected by bearer access tokens.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| POST | `/auth/register` | Register a user |
-| POST | `/auth/login` | Authenticate and issue tokens |
+| POST | `/auth/register` | Register with the configured default role |
+| POST | `/auth/login` | Verify credentials and issue tokens |
 | POST | `/auth/refresh` | Verify a refresh token and issue new tokens |
 | GET | `/health` | Health response |
-| GET | `/clients` | List clients |
-| GET | `/clients/:id` | Fetch one client |
-| POST | `/clients` | Create a client |
-| PUT | `/clients/:id` | Update a client |
-| DELETE | `/clients/:id` | Delete a client |
-| GET | `/cases` | List cases |
-| GET | `/cases/:id` | Fetch one case |
-| POST | `/cases` | Create a case |
-| PUT | `/cases/:id` | Update a case |
-| DELETE | `/cases/:id` | Delete a case |
-| GET | `/hospitals` | List hospitals |
-| GET | `/hospitals/:id` | Fetch one hospital |
-| POST | `/hospitals` | Create a hospital |
-| PUT | `/hospitals/:id` | Update a hospital |
-| DELETE | `/hospitals/:id` | Delete a hospital |
-| GET | `/providers` | List providers |
-| GET | `/providers/:id` | Fetch one provider |
-| POST | `/providers` | Create a provider |
-| PUT | `/providers/:id` | Update a provider |
-| DELETE | `/providers/:id` | Delete a provider |
+| GET, POST | `/clients` | List or create current user's clients |
+| GET, PUT, DELETE | `/clients/:id` | Read, update, or delete a current user's client |
+| GET, POST | `/cases` | List or create current user's cases |
+| GET, PUT, DELETE | `/cases/:id` | Read, update, or delete a current user's case |
+| GET, POST | `/hospitals` | List or create current user's hospitals |
+| GET, PUT, DELETE | `/hospitals/:id` | Read, update, or delete a current user's hospital |
+| GET, POST | `/providers` | List or create current user's providers |
+| GET, PUT, DELETE | `/providers/:id` | Read, update, or delete a current user's provider |
 
-Resource routes are mounted behind access-token middleware in the current entry point. Verify authorization rules, request schemas, and all response shapes before treating this table as a complete API contract.
+## Local setup
 
-## Getting started
-
-### Requirements
-
-- Node.js 22.14.0 or a compatible Node 22 release
-- npm
-- PostgreSQL
-
-### Install
+Requirements: Node.js 22 and PostgreSQL.
 
 ```bash
 git clone https://github.com/amir25121995/cma-api.git
@@ -61,74 +41,43 @@ cd cma-api
 npm install
 ```
 
-Create a local `.env` file with the variable names expected by the code:
+Copy `.env.example` to `.env`. Configure `DATABASE_URL`, token secrets, and `DEFAULT_ROLE_ID`. The default role ID must already exist in the `roles` table and must be a least-privilege role appropriate for self-registration. Never configure a privileged administrator role for public registration.
 
-```dotenv
-PORT=3000
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE_NAME
-JWT_SECRET=replace_with_a_long_random_secret
-JWT_EXPIRES_IN=15m
-REFRESH_SECRET=use_a_different_long_random_secret
-REFRESH_EXPIRES_IN=7d
-```
-
-The expiry values are examples. Use strong, distinct secrets and choose token lifetimes deliberately. Never commit the real `.env` file.
-
-Inspect the SQL files in `sql/` and apply them to your local database in the required order. Then start the server:
+Apply the SQL schema from `sql/create_tables.sql` to a local development database, then start the server:
 
 ```bash
 npm run dev
 ```
 
-For a normal start:
+Check `http://localhost:3000/health`.
+
+## Tests
+
+Run the built-in Node test suite:
 
 ```bash
-npm start
+npm test
 ```
 
-The API defaults to port 3000 unless `PORT` is configured. Check `http://localhost:3000/health`.
+Tests currently cover shared payload validation, ID validation, resource schema allowlists, and nullable optional case dates. Run tests locally and add integration tests against a dedicated test database before treating the API as production-ready.
 
-## Authentication example
+## Security notes
 
-Send login credentials to `POST /auth/login` as JSON:
+- Registration ignores caller-supplied role fields and uses the server-configured `DEFAULT_ROLE_ID`.
+- Request payloads are validated against explicit field allowlists.
+- Resource queries are scoped to the authenticated user's `user_id`.
+- Database error details are not returned to API clients.
+- JWT secrets must be at least 32 characters and should be distinct.
+- Public deployment still needs rate limiting, review of PostgreSQL TLS configuration, refresh-token rotation/revocation, and integration tests.
+- Never use real patient or client data in screenshots or sample fixtures.
 
-```json
-{
-  "email": "demo@example.com",
-  "password": "your-local-demo-password"
-}
-```
-
-Use the returned access token in protected requests:
-
-```http
-Authorization: Bearer YOUR_ACCESS_TOKEN
-```
-
-Confirm the exact request and response fields against the running implementation before publishing examples for registration, login, or refresh.
-
-## Security review before deployment
-
-The current implementation needs a security review before public production deployment:
-
-- Do not trust a client-supplied `role_id` during public registration; assign a safe default server-side and restrict privileged role changes.
-- Validate request bodies, email addresses, IDs, and allowed update fields.
-- Avoid returning raw database error details to clients.
-- Add rate limiting to authentication endpoints.
-- Validate required JWT secrets and expiry settings at startup.
-- Consider refresh-token rotation and revocation.
-- Review PostgreSQL TLS settings for hosted environments; `db.js` currently sets `ssl: false`.
-- Verify role and record-ownership authorization for every resource operation.
-- Add automated tests for authentication, validation, and authorization.
-- Never use real client, patient, or other sensitive data in demo screenshots or seed files.
-
-These are recommendations to implement and verify, not claims that the protections are already in place.
+These protections should be tested in a real environment before deployment.
 
 ## Related repository
 
 - [CMA Laravel web application](https://github.com/amir25121995/cma)
 
-The relationship between the web application and API should be described after the actual integration has been verified.
+The integration between the Laravel application and this API should be documented only after it is verified in the application code.
 
 ## Author
 
