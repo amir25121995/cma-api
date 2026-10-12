@@ -4,7 +4,13 @@ function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-function validatePayload(body, { required = [], allowed = [], emailFields = [] } = {}) {
+function validatePayload(body, {
+  required = [],
+  allowed = [],
+  emailFields = [],
+  defaultMaxLength = 5000,
+  maxLengths = {}
+} = {}) {
   const errors = [];
   if (!isPlainObject(body)) {
     return { valid: false, errors: ['Request body must be a JSON object'] };
@@ -27,7 +33,8 @@ function validatePayload(body, { required = [], allowed = [], emailFields = [] }
       errors.push(`${field} must be a string`);
       continue;
     }
-    if (value.length > 5000) errors.push(`${field} is too long`);
+    const maxLength = maxLengths[field] ?? defaultMaxLength;
+    if (value.length > maxLength) errors.push(`${field} must be ${maxLength} characters or fewer`);
     if (emailFields.includes(field) && value.trim() !== '' && !EMAIL_RE.test(value.trim())) {
       errors.push(`${field} must be a valid email address`);
     }
