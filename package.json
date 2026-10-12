@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node --test"
+    "test": "npm run check && node --test",
+    "check": "node --check index.js && node --check auth.js && node --check db.js && node --check utils/validation.js && node --check utils/resourceSchemas.js && node --check routers/resourceRouter.js && node --check routers/clients.js && node --check routers/cases.js && node --check routers/hospitals.js && node --check routers/providers.js"
   },
   "engines": {
     "node": "22.14.0"
